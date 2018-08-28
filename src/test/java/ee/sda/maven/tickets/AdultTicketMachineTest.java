@@ -39,6 +39,7 @@ public class AdultTicketMachineTest {
         Throwable result = catchThrowable(() -> adultTicketMachine.buy(person));
 
         // then
+        // using Assertions and Lamdas
         assertThat(result)
                 .hasMessage("Sorry, no person data")
                 .isInstanceOfSatisfying(NoPersonDataException.class, e -> {
@@ -171,6 +172,16 @@ public class AdultTicketMachineTest {
         assertEquals(new Ticket( new Person (22), 100, LocalDateTime.now(clock)), result.get(2));
         assertEquals(new Ticket( new Person (23), 100, LocalDateTime.now(clock)), result.get(3));
         assertEquals(new Ticket( new Person (24), 100, LocalDateTime.now(clock)), result.get(4));
+
+        // lists magic using Assertion to check the order
+        // .containsOnly doesn't check ordering
+        assertThat(result).containsExactly(
+                new Ticket( new Person (20), 100, LocalDateTime.now(clock)),
+                new Ticket( new Person (21), 100, LocalDateTime.now(clock)),
+                new Ticket( new Person (22), 100, LocalDateTime.now(clock)),
+                new Ticket( new Person (23), 100, LocalDateTime.now(clock)),
+                new Ticket( new Person (24), 100, LocalDateTime.now(clock))
+        );
     }
 
 }
