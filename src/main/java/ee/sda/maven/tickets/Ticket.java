@@ -12,11 +12,11 @@ public class Ticket {
 
     // constructors
     // timestamp can be set automatically so no constructor for it
-    public Ticket(Person person, int price) {
+    public Ticket(Person person, int price, LocalDateTime timestamp) {
         this.person = person;
         this.price = price;
         //update when ticket is bought
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = timestamp;
     }
 
 

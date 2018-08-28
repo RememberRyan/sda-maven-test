@@ -46,6 +46,36 @@ public class AdultTicketMachineTest {
         }
     }
 
+    // ryan's attempt at underage selling tickets prevention
+    @Test
+    public void buy_ThrowsForbiddenAgeException_IfPersonAgeIsBelow18() throws NoPersonDataException {
+        // given
+        Person person = new Person(10);
+        AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+        // when
+        try {
+            adultTicketMachine.buy(person);
+            fail("no exception was thrown");
+        } catch (ForbiddenAgeException e) {
+            // then
+            assertEquals("Ticket sale is not allowed for this age: 10", e.getMessage());
+            assertEquals(LocalDateTime.now(clock), e.getTimestamp());
+        }
+    }
+
+    @Test
+    public void buy_ReturnsTicket_IfPersonAgeIs18() throws NoPersonDataException {
+        // given
+        Person person = new Person(18);
+        AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+        // when
+        Ticket result = adultTicketMachine.buy(person);
+        // then
+        assertEquals(100, result.getPrice());
+        assertEquals(person, result.getPerson());
+
+    }
+
     @Test
     public void buy_ReturnsFullPriceTicket_IfSubsidizedPersonAndNoDiscountCalculator() throws NoPersonDataException {
         // given

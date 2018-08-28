@@ -38,7 +38,12 @@ public class AdultTicketMachine extends TicketMachine{
             throw new NoPersonDataException("Sorry, no person data", LocalDateTime.now(clock));
         }
         if (discountCalculator == null) {
-            return new Ticket(person, price);
+            return new Ticket(person, price, LocalDateTime.now(clock));
+        }
+
+        // will not sell tickets to under 18 / non-adults
+        if (person.getAge() < 18) {
+            throw new ForbiddenAgeException(person.getAge(), LocalDateTime.now(clock));
         }
 
         // something to calculate the discount
@@ -49,7 +54,7 @@ public class AdultTicketMachine extends TicketMachine{
         double discountedPrice = price - discount;
 
         // (int) is safe until maximum possible integer. It's 'safe' for now
-        return new Ticket(person, (int) Math.floor(discountedPrice));
+        return new Ticket(person, (int) Math.floor(discountedPrice), LocalDateTime.now(clock));
     }
 
 }

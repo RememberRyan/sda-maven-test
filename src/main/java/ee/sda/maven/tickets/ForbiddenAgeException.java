@@ -1,19 +1,12 @@
 package ee.sda.maven.tickets;
-
-
 import java.time.LocalDateTime;
 
-public class NoPersonDataException extends Exception {
-
+public class ForbiddenAgeException extends RuntimeException {
     private LocalDateTime timestamp;
-
-    // constructor with a thrown message
-    public NoPersonDataException(String message, LocalDateTime timestamp) {
-        super(message);
+    public ForbiddenAgeException(int age, LocalDateTime timestamp) {
+        super("Ticket sale is not allowed for this age: " + age);
         this.timestamp = timestamp;
     }
-
-
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
