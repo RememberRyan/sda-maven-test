@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -111,6 +112,31 @@ public class AdultTicketMachineTest {
 
         // verify can also be used
         verify(discountCalculator).calculate(person);
+    }
+
+
+    // Two tests for requesting a ticket history
+    @Test
+    public void getHistory_ReturnsEmptyList_IfNoTicketsWereSold() {
+        // given
+        Person person = new Person(20);
+        AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+        // when
+        List<Ticket> result = adultTicketMachine.getHistory();
+        // then
+        assertTrue(result.isEmpty());
+    }
+    @Test
+    public void getHistory_ReturnsOneEntry_IfOneTicketWasSold() throws NoPersonDataException {
+        // given
+        Person person = new Person(20);
+        AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+        adultTicketMachine.buy(person);
+        // when
+        List<Ticket> result = adultTicketMachine.getHistory();
+        // then
+        assertEquals(1, result.size());
+        assertEquals(new Ticket(person, 100, LocalDateTime.now(clock)), result.get(0));
     }
 
 }

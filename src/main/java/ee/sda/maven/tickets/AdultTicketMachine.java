@@ -5,9 +5,11 @@ package ee.sda.maven.tickets;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 //concrete ticket machine we can now test
-public class AdultTicketMachine extends TicketMachine{
+public class AdultTicketMachine extends TicketMachine {
 
     /*
      almost the same clock but specifying  predefined clock
@@ -21,11 +23,15 @@ public class AdultTicketMachine extends TicketMachine{
     private DiscountCalculator discountCalculator;
     private int price;
 
+    // Ticket history
+    private List<Ticket> history;
+
     // constructor for discount ticket machine
     public AdultTicketMachine(DiscountCalculator discountCalculator, int price, Clock clock) {
         this.discountCalculator = discountCalculator;
         this.price = price;
         this.clock = clock;
+
     }
 
     //we need a method we can now test
@@ -33,7 +39,7 @@ public class AdultTicketMachine extends TicketMachine{
 
     // buying a ticket
     // we need to provide person data to calculate the discount
-    public Ticket buy(Person person)  throws NoPersonDataException {
+    public Ticket buy(Person person) throws NoPersonDataException {
         if (person == null) {
             throw new NoPersonDataException("Sorry, no person data", LocalDateTime.now(clock));
         }
@@ -54,7 +60,21 @@ public class AdultTicketMachine extends TicketMachine{
         double discountedPrice = price - discount;
 
         // (int) is safe until maximum possible integer. It's 'safe' for now
-        return new Ticket(person, (int) Math.floor(discountedPrice), LocalDateTime.now(clock));
+        // removed this 'return' below because of ticket history implementation
+        // return new Ticket(person, (int) Math.floor(discountedPrice), LocalDateTime.now(clock));
+
+        // implementation of ticket history
+        Ticket ticket = new Ticket(person, (int) Math.floor(discountedPrice), LocalDateTime.now(clock));
+        getHistory().add(ticket);
+        return ticket;
     }
 
+    public List<Ticket> getHistory() {
+        if (history == null) {
+            history = new ArrayList<>();
+        }
+        return history;
+    }
 }
+
+
