@@ -1,5 +1,7 @@
 package ee.sda.maven.tickets;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Java6Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -33,19 +36,28 @@ public class AdultTicketMachineTest {
         AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
 
         // when
-        try {
-            adultTicketMachine.buy(person);
-            fail("no exception was thrown");
-        } catch (NoPersonDataException e) {
-            // then
-            assertEquals("Sorry, no person data", e.getMessage());
-            assertNotNull(e.getTimestamp());
-            assertEquals(LocalDateTime.now(clock), e.getTimestamp());
+        Throwable result = catchThrowable(() -> adultTicketMachine.buy(person));
 
-            // assure that null never happens(???) using the placeholder, any()
-            verify(discountCalculator, never()).calculate(any());
-        }
+        // then
+        assertThat(result)
+                .hasMessage("Sorry, no person data")
+                .isInstanceOfSatisfying(NoPersonDataException.class, e -> {
+                    assertThat(e.getTimestamp()).isEqualTo(LocalDateTime.now(clock));
+                });
+
+        verify(discountCalculator, never()).calculate(any());
+
+//    try {
+//      adultTicketMachine.buy(person);
+//      fail("no exception was thrown");
+//    } catch (NoPersonDataException e) {
+//      // then
+//       assertEquals("Sorry, no person data", e.getMessage());
+//       assertEquals(LocalDateTime.now(clock), e.getTimestamp());
+//    }
     }
+
+
 
     // ryan's attempt at underage selling tickets prevention
     @Test
@@ -137,6 +149,28 @@ public class AdultTicketMachineTest {
         // then
         assertEquals(1, result.size());
         assertEquals(new Ticket(person, 100, LocalDateTime.now(clock)), result.get(0));
+    }
+
+    @Test
+    public void getHistory_ReturnsOneEntry_IfFiveTicketWasSold() throws NoPersonDataException {
+        // given;
+        AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+        adultTicketMachine.buy( new Person (20));
+        adultTicketMachine.buy( new Person (21));
+        adultTicketMachine.buy( new Person (22));
+        adultTicketMachine.buy( new Person (23));
+        adultTicketMachine.buy( new Person (24));
+
+        // when
+        List<Ticket> result = adultTicketMachine.getHistory();
+
+        // then
+        assertEquals(5, result.size());
+        assertEquals(new Ticket( new Person (20), 100, LocalDateTime.now(clock)), result.get(0));
+        assertEquals(new Ticket( new Person (21), 100, LocalDateTime.now(clock)), result.get(1));
+        assertEquals(new Ticket( new Person (22), 100, LocalDateTime.now(clock)), result.get(2));
+        assertEquals(new Ticket( new Person (23), 100, LocalDateTime.now(clock)), result.get(3));
+        assertEquals(new Ticket( new Person (24), 100, LocalDateTime.now(clock)), result.get(4));
     }
 
 }

@@ -26,6 +26,24 @@ public class Person {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Person person = (Person) o;
+
+        if (age != person.age) return false;
+        return status == person.status;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = age;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Person{" +
                 "age=" + age +

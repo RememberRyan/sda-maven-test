@@ -21,6 +21,10 @@ public class Ticket {
     }
 
     // implementation of requesting ticket history
+    /*
+    Equals and hashCode need to be overriden because the ticket history has a different reference
+    even though they store the exact same information. Comment out and test to see the difference.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
